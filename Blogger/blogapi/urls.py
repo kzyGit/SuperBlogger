@@ -13,11 +13,15 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.conf.urls import url
-from django.urls import include
-from django.contrib import admin
+from django.conf.urls import url, include
+from .views.users import (UsersView, UserView, LoginView, LogoutView)
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-    url(r'^api/', include('Blogger.blogapi.urls'))
+    url(r'^users/', UsersView.as_view(), name="users"),
+    url(r'^user/(?P<pk>[0-9]+)/', UserView.as_view(), name="user"),
+
+    # Add login on browsable api
+    url(r'^auth-api/', include('rest_framework.urls')),
+    url(r'^login/', LoginView.as_view(), name='login'),
+    url(r'^logout/', LogoutView.as_view(), name='logout')
 ]
