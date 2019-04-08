@@ -1,6 +1,5 @@
 from django.urls import reverse
 from rest_framework.test import APITestCase, APIClient
-from rest_framework.views import status
 from ..models import User
 import json
 
@@ -14,7 +13,8 @@ class BaseViewTest(APITestCase):
 
     def login(self):
         response = self.client.post(
-            reverse('login'), data=json.dumps(self.login_user), content_type="application/json")
+            reverse('login'), data=json.dumps(self.login_user),
+            content_type="application/json")
         self.token = response.data['token']
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token)
         return self.token

@@ -29,7 +29,8 @@ class UsersView(generics.ListCreateAPIView):
         # firstname = request.data['firstname']
         # body = render_to_string(
         #     '../templates/email.html', {'firstname': firstname,
-        #                                 'title': subject, 'message': message})
+        #                                 'title': subject,
+        #                                 'message': message})
         # email = request.data['email']
         # send_email(subject, body, email)
         data = {
