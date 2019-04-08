@@ -7,6 +7,8 @@ from ..permissions import IsAdminUserOrReadOnly
 from rest_framework_jwt.settings import api_settings
 from rest_framework.response import Response
 from django.contrib.auth import login, authenticate, logout
+from ..utils import send_email
+from django.template.loader import render_to_string
 
 jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
 jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
@@ -16,6 +18,26 @@ class UsersView(generics.ListCreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (AllowAny, )
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        subject = "User Registration Confirmation"
+        message = 'Welcome to SuperBlogger space, we are delighted to have you here. The place to share through writing'  # noqa
+        firstname = request.data['firstname']
+        body = render_to_string(
+            '../templates/email.html', {'firstname': firstname,
+                                        'title': subject, 'message': message})
+        email = request.data['email']
+        send_email(subject, body, email)
+        data = {
+            'message': 'User saved successfully',
+            'user_info': serializer.data
+        }
+
+        return Response(data, status=status.HTTP_201_CREATED)
 
 
 class UserView(generics.RetrieveUpdateDestroyAPIView):
