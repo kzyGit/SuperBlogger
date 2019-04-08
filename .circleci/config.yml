@@ -1,9 +1,15 @@
 version: 2
 jobs:
   build:
-    working_directory: ~/circleci-demo-python-django
+    docker:
+      - image: circleci/python:3.6.4
+        environment:
+          TERM: xterm-256color
+      - image: circleci/postgres:9.6.2
+    working_directory: ~/Blogger
     steps:
       - checkout
+      - setup_remote_docker
       - run:
           command: |
             pip3 install virtualenv

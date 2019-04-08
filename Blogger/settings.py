@@ -27,7 +27,7 @@ SECRET_KEY = '=uf+kijq@2z&b#nc%7b7&*lfbfk2a)x2r)gd1ybayrb_xo^%44'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -80,7 +80,10 @@ WSGI_APPLICATION = 'Blogger.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DATABASE_NAME')
+        'NAME': 'blogger',
+        'HOST': 'db',
+        'PORT': 5432,
+        'USER': 'postgres'
     }
 }
 
