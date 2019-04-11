@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import (
     AbstractBaseUser, BaseUserManager, PermissionsMixin)
+from django.template.defaultfilters import slugify
 
 
 class UserManager(BaseUserManager):
@@ -44,3 +45,21 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+
+
+class Articles(models.Model):
+    title = models.CharField(unique=True, max_length=255)
+    body = models.TextField()
+    description = models.TextField()
+    images = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=100, unique=True)
+
+    user = models.ForeignKey(User, related_name='user',
+                             on_delete=models.CASCADE)
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.title)
+        super(Articles, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return self.title

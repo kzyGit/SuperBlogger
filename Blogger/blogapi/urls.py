@@ -14,7 +14,25 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import url, include
+from django.urls import path
 from .views.users import (UsersView, UserView, LoginView, LogoutView)
+from .views.articles import ArticlesView
+
+articles = ArticlesView.as_view({
+    'post': 'post',
+    'get': 'get',
+})
+
+article = ArticlesView.as_view({
+    'get': 'get',
+    'delete': 'delete',
+    'patch': 'update'
+})
+
+
+my_articles = ArticlesView.as_view({
+    'get': 'get_mine',
+})
 
 urlpatterns = [
     url(r'^users/', UsersView.as_view(), name="users"),
@@ -23,5 +41,11 @@ urlpatterns = [
     # Add login on browsable api
     url(r'^auth-api/', include('rest_framework.urls')),
     url(r'^login/', LoginView.as_view(), name='login'),
-    url(r'^logout/', LogoutView.as_view(), name='logout')
+    url(r'^logout/', LogoutView.as_view(), name='logout'),
+
+    # Articles
+    url(r'^articles/$', articles, name='articles'),
+    url(r'^my_articles/', my_articles,
+        name='my_articles'),
+    path('articles/<slug>/', article, name='article')
 ]
