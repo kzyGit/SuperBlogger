@@ -1,6 +1,5 @@
 from django.urls import reverse
 from rest_framework.test import APITestCase, APIClient
-from rest_framework.views import status
 from ..models import User
 import json
 
@@ -8,18 +7,25 @@ import json
 class BaseViewTest(APITestCase):
     client = APIClient()
     login_user = {
-        "username": "ann",
-        "password": "ann@gmail.com"
+        "username": "Tim",
+        "password": "Tim@gmail.com"
     }
 
     def login(self):
         response = self.client.post(
-            reverse('login'), data=json.dumps(self.login_user), content_type="application/json")
+            reverse('login'), data=json.dumps(self.login_user),
+            content_type="application/json")
         self.token = response.data['token']
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.token)
         return self.token
 
     def setUp(self):
+        self.admin = User.objects.create_superuser(
+            username="Tim",
+            firstname="Tim",
+            surname="Tim",
+            email="Tim@gmail.com")
+
         self.new_user = {
             "username": "ann",
             "firstname": "ann",
@@ -37,11 +43,13 @@ class UserTest(BaseViewTest):
 
     def test_get_all_users(self):
         response = self.client.get(reverse('users'))
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(len(response.data), 2)
 
-    def test_gettting_single_user(self):
+    def test_getting_single_user(self):
         response = self.client.get(
-            reverse('user', kwargs={'pk': self.create_user.data['id']}))
+            reverse('user', kwargs={
+                'pk': self.create_user.data['user_info']['id']}))
+
         self.assertEqual(response.status_code, 200)
 
     def test_gettting_non_existent_user(self):
@@ -50,5 +58,13 @@ class UserTest(BaseViewTest):
 
     def test_unathorised_deleting_single_user(self):
         response = self.client.delete(
-            reverse('user', kwargs={'pk': self.create_user.data['id']}))
+            reverse('user', kwargs={
+                'pk': self.create_user.data['user_info']['id']}))
         self.assertEqual(response.status_code, 401)
+
+    def test_deleting_single_user(self):
+        self.login()
+        response = self.client.delete(
+            reverse('user', kwargs={
+                'pk': self.create_user.data['user_info']['id']}))
+        self.assertEqual(response.status_code, 204)
